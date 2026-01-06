@@ -29,11 +29,9 @@ public class PrimaryController {
     private Label downtimeLabel;
 
     @FXML
-
     private Label statusLabel;
 
     @FXML
-
     private TextArea activityTextArea;
 
     @FXML
