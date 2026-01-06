@@ -18,7 +18,7 @@ public class HistoryLogger {
 
     public void logStatusChange(String status) {
         String timestamp = LocalDateTime.now().format(formatter);
-        writeToFile(timestamp + " - Status changed to: " + status + "\n");
+        writeToFile(timestamp + " - Status: " + status + "\n");
     }
 
     public void logSeparator() {
@@ -61,7 +61,7 @@ public class HistoryLogger {
         if (line.contains(SEPARATOR)) {
             return SEPARATOR;
         } else if (line.startsWith("DOWNTIME:")) {
-            return ">>> " + line + " <<<";
+            return "\t\t>>> " + line + " <<<";
         }
         return line;
     }
