@@ -146,7 +146,7 @@
   -fx-font-family: "Courier New", monospace;
   -fx-font-size: 12;
   -fx-text-alignment: left;
-  -fx-padding: 12;
+  -fx-padding: 12 0 12 0;
   -fx-border-width: 0;
   -fx-border-color: transparent;
   -fx-focus-color: transparent;

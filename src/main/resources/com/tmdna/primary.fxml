@@ -40,7 +40,7 @@
                 onAction="#cleanHistory"
                 styleClass="clean-button" />
          </HBox>
-         <VBox spacing="10.0" VBox.vgrow="ALWAYS" alignment="CENTER">
+         <VBox VBox.vgrow="ALWAYS" alignment="CENTER">
             <TextArea fx:id="historyTextArea" wrapText="true" editable="false" styleClass="activity-text" VBox.vgrow="ALWAYS" />
         </VBox>
       </VBox>

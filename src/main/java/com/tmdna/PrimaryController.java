@@ -1,10 +1,14 @@
 package com.tmdna;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import com.tmdna.utils.HistoryLogger;
+import com.tmdna.model.Activity;
+import com.tmdna.service.HistoryService;
+import com.tmdna.service.TimerService;
 import com.tmdna.utils.DurationFormatter;
-import com.tmdna.utils.TimerManager;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -18,8 +22,9 @@ public class PrimaryController {
     private boolean isAvailable = true;
     private long unavailableStartTime = 0;
 
-    private final HistoryLogger historyLogger = new HistoryLogger();
-    private TimerManager timerManager;
+    private final HistoryService historyService = new HistoryService();
+    private TimerService timerService;
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @FXML
     private Button primaryButton;
@@ -47,9 +52,41 @@ public class PrimaryController {
 
     @FXML
     public void initialize() {
-        timerManager = new TimerManager(timerLabel);
-        updateActivityDisplay();
-        updateStatusLabel();
+        downtimeLabel.setText("");
+        timerService = new TimerService(timerLabel);
+        checkInitialStatus();
+    }
+
+    private void checkInitialStatus() {
+        historyService.getLastActivity()
+                .ifPresentOrElse(this::handleExistingActivity, this::updateUI);
+    }
+
+    private void handleExistingActivity(Activity activity) {
+        if (isUnavailable(activity)) {
+            applyUnavailableState(activity);
+        }
+        updateUI();
+    }
+
+    private boolean isUnavailable(Activity activity) {
+        return "UNAVAILABLE".equals(activity.getStatus());
+    }
+
+    private void applyUnavailableState(Activity activity) {
+        isAvailable = false;
+
+        long durationMillis = calculateUnavailableDuration(activity);
+        unavailableStartTime = System.currentTimeMillis() - durationMillis;
+
+        timerService.startTimer(durationMillis);
+    }
+
+    private long calculateUnavailableDuration(Activity activity) {
+        LocalDateTime lastUnavailableTime
+                = LocalDateTime.parse(activity.getTimestamp(), formatter);
+
+        return Duration.between(lastUnavailableTime, LocalDateTime.now()).toMillis();
     }
 
     @FXML
@@ -62,7 +99,7 @@ public class PrimaryController {
 
     @FXML
     private void cleanHistory() {
-        historyLogger.clearHistory();
+        historyService.clearHistory();
         updateActivityDisplay();
     }
 
@@ -78,6 +115,7 @@ public class PrimaryController {
         if (!isHistoryVisible) {
             stage.setHeight(stage.getHeight() + 400);
             toggleHistoryButton.setText("▲");
+            updateActivityDisplay(); // Refresh display when history becomes visible
         } else {
             stage.setHeight(stage.getHeight() - 400);
             toggleHistoryButton.setText("▼");
@@ -113,7 +151,7 @@ public class PrimaryController {
 
     private void handleUnavailableStatus() {
         unavailableStartTime = System.currentTimeMillis();
-        historyLogger.logStatusChange("UNAVAILABLE");
+        historyService.logStatusChange("UNAVAILABLE");
         downtimeLabel.setText("");
     }
 
@@ -121,24 +159,22 @@ public class PrimaryController {
         long unavailableDuration = System.currentTimeMillis() - unavailableStartTime;
         String durationStr = DurationFormatter.format(unavailableDuration);
 
-        historyLogger.logStatusChange("AVAILABLE");
-        historyLogger.logDowntime(durationStr);
-        historyLogger.logSeparator();
+        historyService.logStatusChange("AVAILABLE");
         downtimeLabel.setText("Last Downtime: " + durationStr);
         timerLabel.setText("00:00:00");
     }
 
     private void toggleTimer() {
-        if (timerManager.isRunning()) {
-            timerManager.stopTimer();
+        if (timerService.isRunning()) {
+            timerService.stopTimer();
+            timerService.reset();
         } else {
-            timerManager.reset();
-            timerManager.startTimer();
+            timerService.startTimer();
         }
     }
 
     private void updateActivityDisplay() {
-        List<String> activities = historyLogger.getActivities();
+        List<String> activities = historyService.getActivities();
         StringBuilder content = new StringBuilder();
 
         for (String activity : activities) {

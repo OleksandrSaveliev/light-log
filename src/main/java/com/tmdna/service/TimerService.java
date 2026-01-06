@@ -1,25 +1,28 @@
-package com.tmdna.utils;
+package com.tmdna.service;
+
+import com.tmdna.utils.DurationFormatter;
 
 import javafx.animation.AnimationTimer;
 import javafx.scene.control.Label;
 
-/**
- * Manages the timer functionality.
- */
-public class TimerManager {
+public class TimerService {
 
     private boolean timerRunning = false;
     private long timerStartTime = 0;
     private AnimationTimer animationTimer;
     private final Label timerLabel;
 
-    public TimerManager(Label timerLabel) {
+    public TimerService(Label timerLabel) {
         this.timerLabel = timerLabel;
     }
 
     public void startTimer() {
+        startTimer(0);
+    }
+
+    public void startTimer(long offsetMillis) {
         timerRunning = true;
-        timerStartTime = System.currentTimeMillis();
+        timerStartTime = System.currentTimeMillis() - offsetMillis;
 
         animationTimer = new AnimationTimer() {
             @Override
