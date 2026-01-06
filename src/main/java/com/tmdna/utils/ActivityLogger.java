@@ -10,9 +10,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Handles all activity logging operations.
- */
 public class ActivityLogger {
 
     private static final String LOG_FILE = "logs/activity.log";
