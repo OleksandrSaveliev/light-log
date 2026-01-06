@@ -47,7 +47,6 @@
   -fx-font-weight: 400;
   -fx-padding: 0;
   -fx-min-height: 0;
-  -fx-max-height: USE_PREF_SIZE;
 }
 
 .main-screen .status-label {
@@ -162,6 +161,7 @@
 
 .main-screen .activity-text .scroll-bar {
   -fx-opacity: 0.9;
+  -fx-background-color: #9c9c9c;
 }
 
 .main-screen .activity-text .scroll-bar .thumb {

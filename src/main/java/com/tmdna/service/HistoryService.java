@@ -1,22 +1,23 @@
 package com.tmdna.service;
 
-import com.fasterxml.jackson.databind.MappingIterator;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import com.tmdna.model.Activity;
-import com.tmdna.utils.DurationFormatter;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import com.fasterxml.jackson.databind.MappingIterator;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import com.tmdna.model.Activity;
+import com.tmdna.utils.DurationFormatter;
 
 public class HistoryService {
 
@@ -54,32 +55,55 @@ public class HistoryService {
 
     private List<String> buildFormattedHistory(List<Activity> allActivities) {
         List<String> formattedHistory = new ArrayList<>();
-        Optional<LocalDateTime> unavailableStartTime = Optional.empty();
+        Optional<LocalDateTime> downtimeStart = Optional.empty();
 
-        for (Activity currentActivity : allActivities) {
-            String status = currentActivity.getStatus();
-            LocalDateTime timestamp = LocalDateTime.parse(currentActivity.getTimestamp(), formatter);
+        for (Activity activity : allActivities) {
+            String status = activity.getStatus();
+            LocalDateTime timestamp = parseTimestamp(activity);
 
             if ("UNAVAILABLE".equals(status)) {
-                unavailableStartTime = Optional.of(timestamp);
-                formattedHistory.add(formatLogLine(currentActivity));
+                downtimeStart = handleUnavailable(activity, formattedHistory, timestamp);
             } else if ("AVAILABLE".equals(status)) {
-                if (unavailableStartTime.isPresent()) {
-                    long durationSeconds = java.time.Duration.between(unavailableStartTime.get(), timestamp).getSeconds();
-                    String durationStr = DurationFormatter.format(durationSeconds * 1000);
-                    formattedHistory.add(currentActivity.getTimestamp() + " - Status: AVAILABLE\n\t>>> DOWNTIME: " + durationStr + " <<<");
-                    formattedHistory.add(SEPARATOR);
-                    unavailableStartTime = Optional.empty();
-                } else {
-                    formattedHistory.add(formatLogLine(currentActivity));
-                }
+                downtimeStart = handleAvailable(activity, formattedHistory, timestamp, downtimeStart);
             } else {
-                formattedHistory.add(formatLogLine(currentActivity));
+                formattedHistory.add(formatLogLine(activity));
             }
         }
 
         Collections.reverse(formattedHistory);
         return formattedHistory;
+    }
+
+    private LocalDateTime parseTimestamp(Activity activity) {
+        return LocalDateTime.parse(activity.getTimestamp(), formatter);
+    }
+
+    private Optional<LocalDateTime> handleUnavailable(Activity activity, List<String> formattedHistory, LocalDateTime timestamp) {
+        formattedHistory.add(formatLogLine(activity));
+        return Optional.of(timestamp);
+    }
+
+    private Optional<LocalDateTime> handleAvailable(
+            Activity activity,
+            List<String> formattedHistory,
+            LocalDateTime timestamp,
+            Optional<LocalDateTime> downtimeStart
+    ) {
+        if (downtimeStart.isPresent()) {
+            formattedHistory.add(formatDowntime(activity, downtimeStart.get(), timestamp));
+            formattedHistory.add(SEPARATOR);
+            return Optional.empty();
+        } else {
+            formattedHistory.add(formatLogLine(activity));
+            return downtimeStart;
+        }
+    }
+
+    private String formatDowntime(Activity activity, LocalDateTime start, LocalDateTime end) {
+        long durationMillis = Duration.between(start, end).toMillis();
+        String durationStr = DurationFormatter.format(durationMillis);
+        return String.format("%s - Status: AVAILABLE%n\t>>> DOWNTIME: %s <<<",
+                activity.getTimestamp(), durationStr);
     }
 
     public Optional<Activity> getLastActivity() {

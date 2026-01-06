@@ -115,7 +115,7 @@ public class PrimaryController {
         if (!isHistoryVisible) {
             stage.setHeight(stage.getHeight() + 400);
             toggleHistoryButton.setText("▲");
-            updateActivityDisplay(); // Refresh display when history becomes visible
+            updateActivityDisplay();
         } else {
             stage.setHeight(stage.getHeight() - 400);
             toggleHistoryButton.setText("▼");
