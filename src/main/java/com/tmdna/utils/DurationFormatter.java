@@ -1,8 +1,4 @@
 package com.tmdna.utils;
-
-/**
- * Utility class for formatting time durations
- */
 public class DurationFormatter {
 
     public static String format(long milliseconds) {
