@@ -2,7 +2,7 @@ package com.tmdna;
 
 import java.util.List;
 
-import com.tmdna.utils.ActivityLogger;
+import com.tmdna.utils.HistoryLogger;
 import com.tmdna.utils.DurationFormatter;
 import com.tmdna.utils.TimerManager;
 
@@ -10,13 +10,15 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 public class PrimaryController {
 
     private boolean isAvailable = true;
     private long unavailableStartTime = 0;
 
-    private final ActivityLogger activityLogger = new ActivityLogger();
+    private final HistoryLogger historyLogger = new HistoryLogger();
     private TimerManager timerManager;
 
     @FXML
@@ -32,7 +34,16 @@ public class PrimaryController {
     private Label statusLabel;
 
     @FXML
-    private TextArea activityTextArea;
+    private TextArea historyTextArea;
+
+    @FXML
+    private Button toggleHistoryButton;
+
+    @FXML
+    private VBox historyContent;
+
+    @FXML
+    private VBox historyDivider;
 
     @FXML
     public void initialize() {
@@ -51,8 +62,26 @@ public class PrimaryController {
 
     @FXML
     private void cleanHistory() {
-        activityLogger.clearHistory();
+        historyLogger.clearHistory();
         updateActivityDisplay();
+    }
+
+    @FXML
+    private void toggleHistory() {
+        boolean isHistoryVisible = historyContent.isVisible();
+        historyContent.setVisible(!isHistoryVisible);
+        historyContent.setManaged(!isHistoryVisible);
+        historyDivider.setVisible(!isHistoryVisible);
+        historyDivider.setManaged(!isHistoryVisible);
+
+        Stage stage = (Stage) primaryButton.getScene().getWindow();
+        if (!isHistoryVisible) {
+            stage.setHeight(stage.getHeight() + 400);
+            toggleHistoryButton.setText("▲");
+        } else {
+            stage.setHeight(stage.getHeight() - 400);
+            toggleHistoryButton.setText("▼");
+        }
     }
 
     private void updateUI() {
@@ -84,7 +113,7 @@ public class PrimaryController {
 
     private void handleUnavailableStatus() {
         unavailableStartTime = System.currentTimeMillis();
-        activityLogger.logStatusChange("UNAVAILABLE");
+        historyLogger.logStatusChange("UNAVAILABLE");
         downtimeLabel.setText("");
     }
 
@@ -92,9 +121,9 @@ public class PrimaryController {
         long unavailableDuration = System.currentTimeMillis() - unavailableStartTime;
         String durationStr = DurationFormatter.format(unavailableDuration);
 
-        activityLogger.logStatusChange("AVAILABLE");
-        activityLogger.logDowntime(durationStr);
-        activityLogger.logSeparator();
+        historyLogger.logStatusChange("AVAILABLE");
+        historyLogger.logDowntime(durationStr);
+        historyLogger.logSeparator();
         downtimeLabel.setText("Last Downtime: " + durationStr);
         timerLabel.setText("00:00:00");
     }
@@ -109,13 +138,13 @@ public class PrimaryController {
     }
 
     private void updateActivityDisplay() {
-        List<String> activities = activityLogger.getActivities();
+        List<String> activities = historyLogger.getActivities();
         StringBuilder content = new StringBuilder();
 
         for (String activity : activities) {
             content.append(activity).append("\n");
         }
 
-        activityTextArea.setText(content.toString());
+        historyTextArea.setText(content.toString());
     }
 }

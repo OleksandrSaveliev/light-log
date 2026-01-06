@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ActivityLogger {
+public class HistoryLogger {
 
     private static final String LOG_FILE = "logs/activity.log";
     private static final String SEPARATOR = "─────────────────────────────────────────";

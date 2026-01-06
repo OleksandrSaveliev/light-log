@@ -7,7 +7,7 @@
 
 /* Control Section */
 .main-screen .control-section {
-  -fx-padding: 20;
+  -fx-padding: 10;
   -fx-border-color: transparent;
   -fx-border-width: 0;
   -fx-background-color: transparent;
@@ -15,13 +15,13 @@
 }
 
 .main-screen .control-wrapper {
-  -fx-max-width: 500px;
+  -fx-max-width: 350px;
   -fx-spacing: 18;
 }
 
 /* Section Titles */
 .main-screen .section-title {
-  -fx-font-size: 16;
+  -fx-font-size: 14;
   -fx-font-weight: 600;
   -fx-text-fill: #a1a1a6;
   -fx-font-family: "Segoe UI", "-apple-system", sans-serif;
@@ -30,18 +30,18 @@
 
 /* Timer label styling */
 .main-screen .timer-label {
-  -fx-font-size: 56;
+  -fx-font-size: 40;
   -fx-font-weight: 400;
   -fx-text-fill: #18a0fb;
   -fx-font-family: "Courier New", monospace;
-  -fx-effect: null;
+  -fx-effect: dropshadow(gaussian, rgba(24, 160, 251, 0.5), 10, 0.5, 0, 0);
   -fx-text-alignment: center;
   -fx-padding: 0;
 }
 
 /* Downtime info label styling */
 .main-screen .downtime-info-label {
-  -fx-font-size: 12;
+  -fx-font-size: 10;
   -fx-text-fill: #f4914d;
   -fx-font-family: "Segoe UI", "-apple-system", sans-serif;
   -fx-font-weight: 400;
@@ -53,7 +53,7 @@
 /* Toggle Button styling */
 .main-screen .toggle-button {
   -fx-font-size: 14;
-  -fx-padding: 12 32 12 32;
+  -fx-padding: 8 20 8 20;
   -fx-background-color: #18a0fb;
   -fx-text-fill: white;
   -fx-font-weight: 500;
@@ -61,7 +61,7 @@
   -fx-border-radius: 4;
   -fx-background-radius: 4;
   -fx-cursor: hand;
-  -fx-min-width: 240px;
+  -fx-min-width: 180px;
 }
 
 /* Toggle Button hover state */
@@ -82,14 +82,37 @@
 }
 
 /* Activity section styling */
-.main-screen .activity-section {
-  -fx-padding: 20 0 0 0;
+.main-screen .history-section {
+  -fx-padding: 10 0 0 0;
+}
+
+/* Toggle History Button styling */
+.main-screen .toggle-history-button {
+  -fx-background-color: #27272a;
+  -fx-text-fill: #a1a1a6;
+  -fx-shape: "M 0,0 A 1,1 0 0 1 0,20 A 1,1 0 0 1 0,0"; /* Hack to make it circular */
+  -fx-background-radius: 50;
+  -fx-min-width: 30;
+  -fx-min-height: 30;
+  -fx-max-width: 30;
+  -fx-max-height: 30;
+  -fx-font-size: 12;
+  -fx-padding: 2;
+  -fx-cursor: hand;
+}
+
+.main-screen .toggle-history-button:hover {
+  -fx-background-color: #3f3f46;
+}
+
+.main-screen .toggle-history-button:pressed {
+  -fx-background-color: #52525b;
 }
 
 /* Clean Button styling */
 .main-screen .clean-button {
   -fx-font-size: 11;
-  -fx-padding: 6 14 6 14;
+  -fx-padding: 4 10 4 10;
   -fx-background-color: #f4914d;
   -fx-text-fill: white;
   -fx-font-weight: 500;
@@ -113,7 +136,7 @@
   -fx-control-inner-background: #18181b;
   -fx-text-fill: #a1a1a6;
   -fx-font-family: "Courier New", monospace;
-  -fx-font-size: 11;
+  -fx-font-size: 10;
   -fx-text-alignment: left;
   -fx-padding: 12;
   -fx-border-width: 0;
@@ -130,6 +153,5 @@
 }
 
 .main-screen .activity-text .scroll-bar {
-  -fx-opacity: 0.4;
+  -fx-opacity: 0.8;
 }
-
